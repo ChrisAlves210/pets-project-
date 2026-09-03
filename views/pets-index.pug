@@ -13,3 +13,13 @@ block content
             .text-right
                 a.card-link(href=`/pets/${pet._id}`) View #{pet.name}
 
+  if totalPages > 1
+    nav(aria-label='Pet pages')
+      ul.pagination.justify-content-center
+        li.page-item(class={ disabled: page === 1 })
+          a.page-link(href=`/?term=${encodeURIComponent(term || '')}&page=${page - 1}`, aria-label='Previous') Previous
+        li.page-item.disabled
+          span.page-link Page #{page} of #{totalPages}
+        li.page-item(class={ disabled: page === totalPages })
+          a.page-link(href=`/?term=${encodeURIComponent(term || '')}&page=${page + 1}`, aria-label='Next') Next
+

@@ -15,6 +15,9 @@ html
         ul.navbar-nav
           li.nav-item
             a.nav-link(href='/pets/new') New Pet
+        form.form-inline.ml-auto(action='/' method='GET')
+          input.form-control.mr-sm-2(type='search', name='term', value=term || '', placeholder='Search pets', aria-label='Search pets')
+          button.btn.btn-outline-primary(type='submit') Search
 
     .container
       block content

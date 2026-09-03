@@ -25,6 +25,7 @@ mongoose.connect('mongodb://localhost/local', {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+// Serves files from public/ directly, such as CSS and client-side JavaScript.
 app.use(express.static(path.join(__dirname, 'public')));
 
 // override with POST having ?_method=DELETE or ?_method=PUT
@@ -32,9 +33,13 @@ app.use(methodOverride('_method'))
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// Logs each incoming HTTP request.
 app.use(logger('dev'));
+// Parses URL-encoded form fields into req.body.
 app.use(bodyParser.urlencoded({ extended: false }));
+// Parses JSON request bodies into req.body.
 app.use(bodyParser.json());
+// Parses the Cookie header and exposes cookies on req.cookies.
 app.use(cookieParser());
 
 
