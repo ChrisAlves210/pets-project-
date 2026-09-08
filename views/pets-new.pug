@@ -4,29 +4,29 @@ block content
   .row.justify-content-center
     .col-sm-6
       legend New Pet
-      form(action="/pets", method="post", enctype="multipart/form-data")
+      form(action="#", method="post", enctype="multipart/form-data", id="new-pet")
         .form-group
-          label Name
-          input.form-control(name="name")
+          label Name #[span.text-danger *]
+          input.form-control(name="name", required)
         .form-group
-          label Birthday
-          input.form-control(name="birthday")
+          label Birthday #[span.text-danger *]
+          input.form-control(name="birthday", required)
         .form-group
-          label Species
-          input.form-control(name="species")
+          label Species #[span.text-danger *]
+          input.form-control(name="species", required)
         .form-group
           label Rectangular Image URL
-          input.form-control(name="picUrl")
+          input.form-control(name="picUrl", type="url")
         .form-group
           label Square Image URL
-          input.form-control(name="picUrlSq")
+          input.form-control(name="picUrlSq", type="url")
         .form-group
           label Upload Image
           input.form-control-file(type="file", name="image", accept="image/*")
         .form-group
-          label Favorite Food
-          input.form-control(name="favoriteFood")
+          label Favorite Food #[span.text-danger *]
+          input.form-control(name="favoriteFood", required)
         .form-group
-          label Description
-          textarea.form-control(name="description")
+          label Description #[span.text-danger *]
+          textarea.form-control(name="description", required, minlength="140")
         button(type="submit").btn.btn-primary Save

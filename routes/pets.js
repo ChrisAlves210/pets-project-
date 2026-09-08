@@ -46,7 +46,7 @@ module.exports = (app) => {
   });
 
   // CREATE PET
-  app.post('/pets', upload.single('image'), async (req, res, next) => {
+  app.post('/pets', upload.single('image'), async (req, res) => {
     try {
       const uploadedImageUrl = await uploadImage(req.file);
       const pet = new Pet({
@@ -56,9 +56,10 @@ module.exports = (app) => {
       });
 
       await pet.save();
-      res.redirect(`/pets/${pet._id}`);
+      res.send({ pet: pet });
     } catch (err) {
-      next(err);
+      // STATUS OF 400 FOR VALIDATIONS
+      res.status(400).send(err.errors || { message: err.message });
     }
   });
 
