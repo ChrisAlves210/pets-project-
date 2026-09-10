@@ -14,6 +14,11 @@ const upload = multer({
   }
 });
 
+const uploadFields = upload.fields([
+  { name: 'avatar', maxCount: 1 },
+  { name: 'image', maxCount: 1 }
+]);
+
 const uploadImage = async (file) => {
   if (!file) return null;
   if (!process.env.S3_BUCKET || !process.env.S3_REGION) {
@@ -46,13 +51,15 @@ module.exports = (app) => {
   });
 
   // CREATE PET
-  app.post('/pets', upload.single('image'), async (req, res) => {
+  app.post('/pets', uploadFields, async (req, res) => {
     try {
-      const uploadedImageUrl = await uploadImage(req.file);
+      const uploadedFiles = req.files && (req.files.avatar || req.files.image);
+      const uploadedImageUrl = await uploadImage(uploadedFiles && uploadedFiles[0]);
       const pet = new Pet({
         ...req.body,
-        picUrl: uploadedImageUrl || req.body.picUrl,
-        picUrlSq: uploadedImageUrl || req.body.picUrlSq
+        avatarUrl: uploadedImageUrl,
+        picUrl: req.body.picUrl,
+        picUrlSq: req.body.picUrlSq
       });
 
       await pet.save();
@@ -70,6 +77,34 @@ module.exports = (app) => {
     });
   });
 
+  // PURCHASE PET
+  app.post('/pets/:id/purchase', async (req, res) => {
+    try {
+      if (!process.env.PRIVATE_STRIPE_API_KEY) {
+        throw new Error('PRIVATE_STRIPE_API_KEY is not configured.');
+      }
+      if (!req.body.stripeToken) {
+        return res.status(400).send('A Stripe payment token is required.');
+      }
+
+      const pet = await Pet.findById(req.body.petId || req.params.id).exec();
+      if (!pet) return res.status(404).send('Pet not found.');
+
+      const stripe = require('stripe')(process.env.PRIVATE_STRIPE_API_KEY);
+      await stripe.charges.create({
+        amount: Math.round(pet.price * 100),
+        currency: 'usd',
+        description: `Purchased ${pet.name}, ${pet.species}`,
+        source: req.body.stripeToken
+      });
+
+      res.redirect(`/pets/${pet._id}`);
+    } catch (err) {
+      console.error('Stripe purchase failed:', err.message);
+      res.status(400).send('Unable to process the purchase.');
+    }
+  });
+
   // EDIT PET
   app.get('/pets/:id/edit', (req, res) => {
     Pet.findById(req.params.id).exec((err, pet) => {
@@ -78,12 +113,13 @@ module.exports = (app) => {
   });
 
   // UPDATE PET
-  app.put('/pets/:id', upload.single('image'), async (req, res, next) => {
+  app.put('/pets/:id', uploadFields, async (req, res, next) => {
     try {
-      const uploadedImageUrl = await uploadImage(req.file);
+      const uploadedFiles = req.files && (req.files.avatar || req.files.image);
+      const uploadedImageUrl = await uploadImage(uploadedFiles && uploadedFiles[0]);
       const updates = {
         ...req.body,
-        ...(uploadedImageUrl && { picUrl: uploadedImageUrl, picUrlSq: uploadedImageUrl })
+        ...(uploadedImageUrl && { avatarUrl: uploadedImageUrl })
       };
       const pet = await Pet.findByIdAndUpdate(req.params.id, updates);
       res.redirect(`/pets/${pet._id}`);

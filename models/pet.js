@@ -7,10 +7,12 @@ const PetSchema = new Schema({
     name            : { type: String, required: true }
   , species         : { type: String, required: true }
   , birthday        : { type: String, required: true }
-  , picUrl          : { type: String, required: true }
-  , picUrlSq        : { type: String, required: true }
+  , picUrl          : { type: String }
+  , picUrlSq        : { type: String }
+  , avatarUrl       : { type: String }
   , favoriteFood    : { type: String, required: true }
   , description     : { type: String, required: true, minlength: 140 }
+  , price           : { type: Number, required: true, min: 0, default: 9.99 }
 },
 {
   timestamps: true

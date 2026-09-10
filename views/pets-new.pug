@@ -22,11 +22,14 @@ block content
           input.form-control(name="picUrlSq", type="url")
         .form-group
           label Upload Image
-          input.form-control-file(type="file", name="image", accept="image/*")
+          input.form-control-file(type="file", name="avatar", accept="image/*")
         .form-group
           label Favorite Food #[span.text-danger *]
           input.form-control(name="favoriteFood", required)
         .form-group
           label Description #[span.text-danger *]
           textarea.form-control(name="description", required, minlength="140")
+        .form-group
+          label Price #[span.text-danger *]
+          input.form-control(name="price", type="number", min="0", step="0.01", required)
         button(type="submit").btn.btn-primary Save
